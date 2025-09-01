@@ -1,0 +1,11 @@
+# Core dependencies
+fastapi
+uvicorn
+python-dotenv
+pydantic
+pydantic-settings
+
+# Database
+SQLAlchemy
+psycopg2-binary
+alembic

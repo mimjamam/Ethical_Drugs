@@ -23,8 +23,23 @@ def login(request: ProfileData, db: Session = Depends(get_db)):
                     "Data": {}
                 }
             ]
-        
-        current_time = db.execute(text("SELECT NOW() AT TIME ZONE 'Asia/Dhaka';")).fetchone()[0]
+
+        # user_info = db.execute(text("""
+        #         SELECT 
+        #             cbp.value AS "cbPartnerValue",
+        #             cbp.name AS "cbParnerName",
+        #             hrj.name AS "hr_job_name",
+        #             cs.name AS "cSalesname",
+        #             cb.joiningdate AS "joining_date"
+        #         FROM c_bpartner AS cbp
+        #         LEFT JOIN hr_job AS hrj ON cbp.hr_job_id = hrj.hr_job_id
+        #         LEFT JOIN t_supervisorassignment AS tsa ON cbp.c_bpartner_id = tsa.c_bpartner_id
+        #             AND (tsa.datefinish IS NULL 
+        #                 AND NOW() AT TIME ZONE 'Asia/Dhaka' >= tsa.datestart)
+        #         LEFT JOIN c_salesregion AS cs ON tsa.c_salesregion_id = cs.c_salesregion_id
+        #         LEFT JOIN c_bpartner cb ON tsa.c_bpartner_id = cb.c_bpartner_id 
+        #         WHERE cbp.c_bpartner_id = :cPartnerId
+        #     """), {"cPartnerId": request.cPartnerId}).fetchall()
 
         user_info = db.execute(text("""
                 SELECT 
@@ -36,11 +51,11 @@ def login(request: ProfileData, db: Session = Depends(get_db)):
                 FROM c_bpartner AS cbp
                 LEFT JOIN hr_job AS hrj ON cbp.hr_job_id = hrj.hr_job_id
                 LEFT JOIN t_supervisorassignment AS tsa ON cbp.c_bpartner_id = tsa.c_bpartner_id
-                    AND (tsa.datefinish IS NULL 
-                        AND NOW() AT TIME ZONE 'Asia/Dhaka' >= tsa.datestart)
+                AND NOW() AT TIME ZONE 'Asia/Dhaka' >= tsa.datestart
+                AND (tsa.datefinish IS NULL OR NOW() AT TIME ZONE 'Asia/Dhaka' <= tsa.datefinish)
                 LEFT JOIN c_salesregion AS cs ON tsa.c_salesregion_id = cs.c_salesregion_id
                 LEFT JOIN c_bpartner cb ON tsa.c_bpartner_id = cb.c_bpartner_id 
-                WHERE cbp.c_bpartner_id = :cPartnerId
+                WHERE cbp.c_bpartner_id = :cPartnerId;
             """), {"cPartnerId": request.cPartnerId}).fetchall()
 
         if not user_info:

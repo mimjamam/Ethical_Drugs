@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 import time
 import logging
 from app.api.endpoints import (
-    login, profile_data
+    login, profile_data, get_customer
 )
 
 # Configure logging
@@ -55,8 +55,9 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 # Include routers
 
-app.include_router(login.router, prefix="/auth", tags=["auth"])
-app.include_router(profile_data.router, prefix="/auth", tags=["auth"])
+app.include_router(login.router, prefix="/ethical", tags=["auth"])
+app.include_router(profile_data.router, prefix="/ethical", tags=["auth"])
+app.include_router(get_customer.router, prefix="/ethical", tags=["Customer Info"])
 
 # Health check endpoint
 @app.get("/health")

@@ -83,8 +83,7 @@ def get_customers_under_supervisor(request: SupervisorRequest, db: Session = Dep
                 "customerCode": row.customer_code,
                 "customerName": row.customer_name,
                 "phone": row.phone,
-                "city": row.city,
-                "address1": row.address1,
+                "address": f"{row.address1},{row.city}",
                 "countryName": row.country_name
             }
             for row in result

@@ -35,18 +35,18 @@ def login(request: UserLogin, db: Session = Depends(get_db)):
         ).fetchone()
 
         if not user:
-            return {
+            return [{
                 "Status": False,
                 "Message": "Invalid user_id or password",
                 "Data": {"cPartnerId": None}
-            }
+            }]
 
         if user.isactive != "Y":
-            return {
+            return [{
                 "Status": False,
                 "Message": "User isn't active",
                 "Data": {"cPartnerId": None}
-            }
+            }]
 
         # Prepare response
         user_info = {
@@ -55,19 +55,20 @@ def login(request: UserLogin, db: Session = Depends(get_db)):
             "adClientId": user.ad_client_id,
             "adOrgId": user.ad_org_id
         }
+        
 
-        return {
+        return [{
             "Status": True,
             "Message": "Logged in Successfully",
             "Data": user_info
-        }
+        }]
 
     except Exception as e:
-        raise HTTPException(
+        raise [HTTPException(
             status_code=500,
             detail={
                 "Status": 500,
                 "Message": f"An error occurred: {str(e)}",
                 "Data": {"cPartnerId": None}
             }
-        )
+        )]

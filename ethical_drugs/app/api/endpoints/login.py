@@ -6,64 +6,68 @@ from ..models.base import get_db
 
 router = APIRouter()
 
-class User_login(BaseModel):
+
+class UserLogin(BaseModel):
     user_id: str
     password: str
 
 
 @router.post("/login")
-def login(request: User_login, db: Session = Depends(get_db)):
-    """ User login generation """
+def login(request: UserLogin, db: Session = Depends(get_db)):
+    """User login endpoint"""
     try:
-        # Check if all required fields are provided
+        # Check required fields
         if not request.user_id or not request.password:
-            return [
-                {
-                    "Status": 400,
-                    "Message": "You didn't provide all info",
-                    "Data": {"cPartnerId": None}
-                }
-            ]
+            return {
+                "Status": 400,
+                "Message": "You didn't provide all info",
+                "Data": {"cPartnerId": None}
+            }
 
-        # Fetch user info by user_id and password
-        user = db.execute(text("""
-            SELECT isactive, c_bpartner_id
-            FROM ad_user
-            WHERE name = :name AND password = :password
-        """), {"name": request.user_id, "password": request.password}).fetchone()
+        # Execute raw SQL query
+        user = db.execute(
+            text("""
+                SELECT isactive, c_bpartner_id, ad_user_id, ad_client_id, ad_org_id
+                FROM ad_user
+                WHERE name = :name AND password = :password
+            """),
+            {"name": request.user_id, "password": request.password}
+        ).fetchone()
 
         if not user:
-            return [
-                {
-                    "Status": False,
-                    "Message": "Invalid user_id or password",
-                    "Data": {"cPartnerId": None}
-                }
-            ]
-        
-        if user.isactive != "Y":
-            return [
-                {
-                    "Status": False,
-                    "Message": "User isn't active",
-                    "Data": {"cPartnerId": None}
-                }
-            ]
-
-        return [
-            {
-                "Status": True,
-                "Message": "Logged in Successfully",
-                "Data": {"cPartnerId": user.c_bpartner_id}
+            return {
+                "Status": False,
+                "Message": "Invalid user_id or password",
+                "Data": {"cPartnerId": None}
             }
-        ]
+
+        if user.isactive != "Y":
+            return {
+                "Status": False,
+                "Message": "User isn't active",
+                "Data": {"cPartnerId": None}
+            }
+
+        # Prepare response
+        user_info = {
+            "cBpartnerId": user.c_bpartner_id,
+            "adUserId": user.ad_user_id,
+            "adClientId": user.ad_client_id,
+            "adOrgId": user.ad_org_id
+        }
+
+        return {
+            "Status": True,
+            "Message": "Logged in Successfully",
+            "Data": user_info
+        }
+
     except Exception as e:
-        raise [HTTPException(
+        raise HTTPException(
             status_code=500,
             detail={
                 "Status": 500,
                 "Message": f"An error occurred: {str(e)}",
                 "Data": {"cPartnerId": None}
             }
-        )]
-
+        )

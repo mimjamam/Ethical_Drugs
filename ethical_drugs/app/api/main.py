@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 import time
 import logging
 from app.api.endpoints import (
-    login, profile_data, get_customer
+    login, profile_data, get_customer, product_list, discounts
 )
 
 # Configure logging
@@ -16,10 +16,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    description="GNU Health Middleware API for managing healthcare appointments and user data",
+    description="Ethical Drugs API",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    contact={
+        "name": "Md Bikasuzzaman",
+        "email": "bikas.zaman@sysnova.com",
+        "url": "https://sysnova.com"  # optional
+    }
 )
 
 app.add_middleware(
@@ -54,12 +59,15 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An internal server error occurred"}
     )
 # Include routers
-
-app.include_router(login.router, prefix="/ethical", tags=["auth"])
-app.include_router(profile_data.router, prefix="/ethical", tags=["auth"])
-app.include_router(get_customer.router, prefix="/ethical", tags=["Customer Info"])
-
 # Health check endpoint
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+app.include_router(login.router, prefix="/ethical", tags=["Login"])
+app.include_router(profile_data.router, prefix="/ethical", tags=["Profile Data"])
+app.include_router(get_customer.router, prefix="/ethical", tags=["Customer Info"])
+app.include_router(product_list.router, prefix="/ethical", tags=["Product List"])
+app.include_router(discounts.router, prefix="/ethical", tags=["Discounts List"])
+
+

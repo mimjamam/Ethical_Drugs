@@ -1,27 +1,33 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import text
 from pydantic import BaseModel
+from sqlalchemy.sql import text
 from ..models.base import get_db
 
 router = APIRouter()
 
-class ProductFilter(BaseModel):
-    cbPartnerId: int = 0           # Remains in input, but not used in query
-    activityCategory: str = None    # Optional: "Human" or "Veterinary"
+class Product(BaseModel):
+    cbPartnerId: int  
 
 @router.post("/productList")
-def get_product_list(request: ProductFilter, db: Session = Depends(get_db)):
-    
+def get_product_list(request: Product, db: Session = Depends(get_db)):
+    """ Get full product list with activity name """
     try:
-        query_str = """
+        if not request.cbPartnerId:
+            return [{
+                "Status": 400,
+                "Message": "You didn't provide supervisorId",
+                "Data": []
+            }]
+
+        query = text("""
             SELECT 
                 mp.value || '-' || mp.name AS product,
                 mp.M_Product_ID as "M_Product_ID",
                 mp.value AS pro_value,
                 mp.name AS pro_name,
                 pp.pricestd,
-                mp.M_Product_Category_ID as "M_Product_Category_ID",
+                mp.M_Product_Category_ID as "M_Product_Category_ID" ,
                 mp.c_uom_id,
                 mp.sku,
                 ct.name AS tax,
@@ -65,16 +71,10 @@ def get_product_list(request: ProductFilter, db: Session = Depends(get_db)):
                         WHERE M_PriceList_ID = 1000002
                     )
                 )
-              -- Optional activity filter, case-insensitive
-              AND (:activityCategory IS NULL OR LOWER(ca.name) LIKE '%' || LOWER(:activityCategory) || '%')
             ORDER BY mp.name;
-        """
+        """)
 
-        params = {
-            "activityCategory": request.activityCategory if request.activityCategory else None
-        }
-
-        result = db.execute(text(query_str), params).fetchall()
+        result = db.execute(query).fetchall()
 
         if not result:
             return [{
@@ -85,18 +85,18 @@ def get_product_list(request: ProductFilter, db: Session = Depends(get_db)):
 
         products = [
             {
-                "taxname": row._mapping["taxname"],
-                "product": row._mapping["product"],
-                "proCode": row._mapping["pro_value"],
-                "mProductId": row._mapping["M_Product_ID"],
-                "pricestd": row._mapping["pricestd"],
-                "vat": row._mapping["vat"],
-                "cUomId": row._mapping["c_uom_id"],
-                "tax": row._mapping["tax"],
-                "mProductCategoryId": row._mapping["M_Product_Category_ID"],
-                "sku": row._mapping["sku"],
-                "proName": row._mapping["pro_name"],
-                "activityName": row._mapping["activity_name"]
+                "taxname": row.taxname,
+                "product": row.product,
+                "proCode": row.pro_value,
+                "mProductId": row.M_Product_ID,
+                "pricestd": row.pricestd,
+                "vat": row.vat,
+                "cUomId": row.c_uom_id,
+                "tax": row.tax,
+                "mProductCategoryId": row.M_Product_Category_ID,
+                "sku": row.sku,
+                "proName": row.pro_name,
+                "activityName": row.activity_name
             }
             for row in result
         ]
@@ -112,6 +112,6 @@ def get_product_list(request: ProductFilter, db: Session = Depends(get_db)):
             status_code=500,
             detail={
                 "Status": 500,
-                "Message": f"An error occurred: {str(e)}"
+                "Message": f"An error occurred: {str(e)}",
             }
         )

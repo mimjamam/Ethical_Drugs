@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 import time
 import logging
 from app.api.endpoints import (
-    login, profile_data, get_customer, product_list, discounts
+    login, profile_data, get_customer, product_list, discounts, sales_order, segment,locations
 )
 
 # Configure logging
@@ -69,5 +69,8 @@ app.include_router(profile_data.router, prefix="/ethical", tags=["Profile Data"]
 app.include_router(get_customer.router, prefix="/ethical", tags=["Customer Info"])
 app.include_router(product_list.router, prefix="/ethical", tags=["Product List"])
 app.include_router(discounts.router, prefix="/ethical", tags=["Discounts List"])
+app.include_router(sales_order.router, prefix="/ethical", tags=["Sales Order"])
+app.include_router(segment.router, prefix="/ethical", tags=["Segment"])
+app.include_router(locations.router, prefix="/ethical", tags=["Locations"])
 
 

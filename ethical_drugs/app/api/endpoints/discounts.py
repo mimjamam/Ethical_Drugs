@@ -10,7 +10,7 @@ router = APIRouter()
 class DiscountRequest(BaseModel):
     customerId: Optional[int] = None
     group_id: Optional[int] = None
-    iscash: str  # 'Y' or 'N'
+    iscash: str 
 
 @router.post("/discounts")
 def get_discounts(request: DiscountRequest, db: Session = Depends(get_db)):
@@ -89,23 +89,23 @@ def get_discounts(request: DiscountRequest, db: Session = Depends(get_db)):
 
         discounts = [
             {
-                "discount_category": row.discount_category,
-                "m_discountschema_id": row.m_discountschema_id,
-                "discountschema_type": row.discountschema_type,
-                "discountschema_name": row.discountschema_name,
-                "validfrom": str(row.validfrom),
-                "validto": str(row.validto),
-                "discounttype": row.discounttype,
-                "isquantitybased": row.isquantitybased,
-                "ismixed": row.ismixed,
-                "maxvalue": row.maxvalue,
-                "minvalue": row.minvalue,
-                "m_discountschemabreak_id": row.m_discountschemabreak_id,
-                "m_product_id": row.m_product_id,
-                "breakvalue": row.breakvalue,
-                "breakdiscount": row.breakdiscount,
-                "freeqty": row.freeqty,
-                "seqno": row.seqno
+                "discountCategory": row.discount_category,
+                "mDiscountschemaId": row.m_discountschema_id,
+                "discountSchemaType": row.discountschema_type,
+                "discountschemaName": row.discountschema_name,
+                "validFrom": str(row.validfrom),
+                "validTo": str(row.validto),
+                "discountType": row.discounttype,
+                "isQuantityBased": row.isquantitybased,
+                "isMixed": row.ismixed,
+                "maxValue": row.maxvalue,
+                "minValue": row.minvalue,
+                "mDiscountschemabreakId": row.m_discountschemabreak_id,
+                "mProductId": row.m_product_id,
+                "breakValue": row.breakvalue,
+                "breakDiscount": row.breakdiscount,
+                "freeQty": row.freeqty,
+                "seqNo": row.seqno
             }
             for row in result
         ]

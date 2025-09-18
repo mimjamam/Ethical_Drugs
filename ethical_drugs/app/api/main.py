@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 import time
 import logging
 from app.api.endpoints import (
-    login, profile_data, get_customer, product_list, discounts, sales_order, segment,locations
+    login, profile_data, get_customer, product_list, discounts, sales_order, segment,locations,orderList
 )
 
 # Configure logging
@@ -23,7 +23,7 @@ app = FastAPI(
     contact={
         "name": "Md Bikasuzzaman",
         "email": "bikas.zaman@sysnova.com",
-        "url": "https://sysnova.com"  # optional
+        "url": "https://sysnova.com"  
     }
 )
 
@@ -72,5 +72,6 @@ app.include_router(discounts.router, prefix="/ethical", tags=["Discounts List"])
 app.include_router(sales_order.router, prefix="/ethical", tags=["Sales Order"])
 app.include_router(segment.router, prefix="/ethical", tags=["Segment"])
 app.include_router(locations.router, prefix="/ethical", tags=["Locations"])
+app.include_router(orderList.router, prefix="/ethical", tags=["Order List"])
 
 

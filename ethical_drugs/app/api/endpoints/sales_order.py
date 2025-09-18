@@ -42,10 +42,10 @@ class SalesOrderRequest(BaseModel):
 @router.post("/create_salesorder")
 def create_salesorder(request: SalesOrderRequest, db: Session = Depends(get_db)):
     try:
-        
+        # Turn off auto-commit to control transaction
         db.autocommit = False
 
-        
+        # --- Insert Sales Order Header ---
         try:
             sql_order = text("""
                 INSERT INTO adempiere.t_salesorder (
@@ -73,7 +73,7 @@ def create_salesorder(request: SalesOrderRequest, db: Session = Depends(get_db))
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Sales Order Header Insert Error: {str(e)}")
 
-        
+        # --- Insert Sales Order Lines ---
         try:
             sql_line = text("""
                 INSERT INTO adempiere.t_salesorderline (
@@ -100,7 +100,7 @@ def create_salesorder(request: SalesOrderRequest, db: Session = Depends(get_db))
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Sales Order Line Insert Error: {str(e)}")
 
-    
+        # --- Commit Transaction ---
         try:
             db.commit()
         except Exception as e:

@@ -9,7 +9,7 @@ router = APIRouter()
 class ProfileData(BaseModel):
     cPartnerId: int
 
-@router.post("/profile_data")
+@router.post("/profileData")
 def profile_data(request: ProfileData, db: Session = Depends(get_db)):
     """Optimized User Profile Data API"""
 

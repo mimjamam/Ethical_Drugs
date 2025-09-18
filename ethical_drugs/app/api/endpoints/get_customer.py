@@ -9,7 +9,7 @@ router = APIRouter()
 class SupervisorRequest(BaseModel):
     cbPartnerId: int  
 
-@router.post("/get_customers")
+@router.post("/getCustomers")
 def get_customers_under_supervisor(request: SupervisorRequest, db: Session = Depends(get_db)):
     """ Get all customers under a supervisor """
     try:

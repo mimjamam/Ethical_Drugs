@@ -30,7 +30,7 @@ def get_segments(db: Session = Depends(get_db)):
             }
 
         segments = [
-            {"C_Activity_ID": row.c_activity_id, "loc": row.segment} 
+            {"cActivityID": row.c_activity_id, "type": row.segment} 
             for row in result
         ]
 

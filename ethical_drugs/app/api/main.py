@@ -21,8 +21,8 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     contact={
-        "name": "Md Bikasuzzaman",
-        "email": "bikas.zaman@sysnova.com",
+        "name": "Mimjamam UL Haque Monmoy",
+        "email": "monmoy324@gmail.com",
         "url": "https://sysnova.com"  
     }
 )
